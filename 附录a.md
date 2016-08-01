@@ -18,15 +18,16 @@ $ sudo rudix install redis
 $ redis-server
 ```
 
-下面安装Python的Redis库：
+下面使用pip安装Python的Redis库，首先安装pip：
 
-
-
-
-
-
+```
+$ sudo rudix install pip
+$ sudo pip install redis
+```
 
 ## A.3 Windows
 
 ## A.4 Hello Redis
+
+![](/assets/QQ20160801-1.png)
 

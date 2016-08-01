@@ -30,3 +30,31 @@ Redis非常适合解决实时性问题。
 
 ![](/assets/QQ20160729-1.png)
 
+### 1.2.1 Strings in Redis
+
+![](/assets/QQ20160801-2.png)
+
+![](/assets/QQ20160801-3.png)
+
+```
+$ redis-cli
+127.0.0.1:6379> set hello world
+OK
+127.0.0.1:6379> get hello
+"world"
+127.0.0.1:6379> del hello
+(integer) 1
+127.0.0.1:6379> get hello
+(nil)
+```
+
+### 1.2.2 Lists in Redis
+
+![](/assets/QQ20160801-4.png)
+
+
+
+
+
+
+
