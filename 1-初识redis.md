@@ -34,7 +34,7 @@ Redis非常适合解决实时性问题。
 
 ![](/assets/QQ20160801-2.png)
 
-![](/assets/QQ20160801-3.png)
+常用命令：GET、SET、DEL：
 
 ```
 $ redis-cli
@@ -51,10 +51,4 @@ OK
 ### 1.2.2 Lists in Redis
 
 ![](/assets/QQ20160801-4.png)
-
-
-
-
-
-
 
