@@ -24,13 +24,9 @@ Redis经常被拿来与memcached（高性能key-value缓存服务器）作比较
 
 Redis非常适合解决实时性问题。
 
+如何安装可参考附录A。
+
 ## 1.2 Redis数据结构
 
 ![](/assets/QQ20160729-1.png)
-
-
-
-
-
-
 
