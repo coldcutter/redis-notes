@@ -4,6 +4,28 @@
 
 ## A.2 OS X
 
+不使用编译器安装Redis，可以使用一个Python工具Rudix：
+
+```bash
+$ curl -O https://raw.githubusercontent.com/rudix-mac/rpm/2015.10.20/rudix.py
+$ sudo python rudix.py install rudix
+$ sudo rudix install redis 
+```
+
+待安装完成后，就可以启动redis了：
+
+```bash
+$ redis-server
+```
+
+下面安装Python的Redis库：
+
+
+
+
+
+
+
 ## A.3 Windows
 
 ## A.4 Hello Redis
