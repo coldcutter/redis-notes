@@ -52,7 +52,7 @@ OK
 
 ![](/assets/QQ20160801-4.png)
 
-常用命令：LPUSH/RPUSH、LPOP/RPOP、LINDEX、LRANGE
+常用命令：LPUSH\/RPUSH、LPOP\/RPOP、LINDEX、LRANGE
 
 ```
 127.0.0.1:6379> rpush list-key item
@@ -194,3 +194,6 @@ ZSETs同样存储键值对，键（called members）是唯一的，值（called 
 为了充分节约内存，我们假设超过一周时间用户就不能再投票了，分数固定了，因此过一周我们就可以删掉对应文章的投票用户列表了。
 
 投票的流程是这样的：先检查文章是否在一周内发布，如果是，试图将用户加入文章的投票列表，如果用户之前没投过，增加文章的分数432分，最后更新文章的总投票数加1。
+
+
+
