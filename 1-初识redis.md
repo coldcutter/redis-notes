@@ -195,5 +195,17 @@ ZSETs同样存储键值对，键（called members）是唯一的，值（called 
 
 投票的流程是这样的：先检查文章是否在一周内发布，如果是，试图将用户加入文章的投票列表，如果用户之前没投过，增加文章的分数432分，最后更新文章的总投票数加1。
 
+```
+ONE_WEEK_IN_SECONDS = 7 * 86400
+VOTE_SCORE = 432
 
-
+def article_vote(conn, user, article):
+    cutoff = time.time() - ONE_WEEK_IN_SECONDS
+    if conn.zscore('time:', article) < cutoff:
+        return
+    
+    article_id = article.partition(':')[-1]
+    if conn.sadd('voted:' + article_id, user):
+        conn.zincrby('score:', article, VOTE_SCORE)
+        conn.hincrby(article, 'votes', 1)
+```
