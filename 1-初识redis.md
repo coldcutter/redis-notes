@@ -193,6 +193,8 @@ ZSETs同样存储键值对，键（called members）是唯一的，值（called 
 
 为了充分节约内存，我们假设超过一周时间用户就不能再投票了，分数固定了，因此过一周我们就可以删掉对应文章的投票用户列表了。
 
+**投票**
+
 投票的流程是这样的：先检查文章是否在一周内发布，如果是，试图将用户加入文章的投票列表，如果用户之前没投过，增加文章的分数432分，最后更新文章的总投票数加1。
 
 ```
@@ -203,9 +205,79 @@ def article_vote(conn, user, article):
     cutoff = time.time() - ONE_WEEK_IN_SECONDS
     if conn.zscore('time:', article) < cutoff:
         return
-    
+
     article_id = article.partition(':')[-1]
     if conn.sadd('voted:' + article_id, user):
         conn.zincrby('score:', article, VOTE_SCORE)
         conn.hincrby(article, 'votes', 1)
 ```
+
+**发布和获取文章列表**
+
+要发布一篇文章，我们首先使用INCR增加计数器作为文章id，然后把发布人id自动加入投票集合，为了确保一周后这个集合会被删除，使用EXPIRE命令给一个过期时间，这样Redis会自动删除它，然后使用HMSET存储文章信息，最后，把初始分数和发布时间加入相应的ZSETs：
+
+```
+def post_article(conn, user, title, link):
+    article_id = str(conn.incr('article:'))
+
+    voted = 'voted:' + article_id
+    conn.sadd(voted, user)
+    conn.expire(voted, ONE_WEEK_IN_SECONDS)
+
+    now = time.time()
+    article = 'article:' + article_id
+    conn.hmset(article, {
+        'title': title,
+        'link': link,
+        'poster': user,
+        'time': now,
+        'votes': 1
+    })
+    conn.zadd('score:', article, now + VOTE_SCORE)
+    conn.zadd('time:', article, now)
+
+    return article_id
+```
+
+如何获取当前分数靠前或者最近发布的文章呢？我们可以使用ZRANGE获取文章IDs，然后使用HGETALL获取每一篇文章的信息，唯一需要注意的是，ZSETs按照分数升序排序，不过我们可以使用ZREVRANGEBYSCORE以反向顺序获取：
+
+```
+ARTICLES_PER_PAGE = 25
+
+def get_articles(conn, page, order='score:'):
+    start = (page - 1) * ARTICLES_PER_PAGE
+    end = start + ARTICLES_PER_PAGE - 1
+
+    ids = conn.zrevrange(order, start, end)
+    articles = []
+    for id in ids:
+        article_data = conn.hgetall(id)
+        article_data['id'] = id
+        articles.append(article_data)
+
+    return articles
+```
+
+**添加主题分组**
+
+现在想支持文章按不同的主题分组，对每个主题，我们使用一个SET保存改组的所有文章IDs，先提供一个添加文章到组和从组中移除文章的函数：
+
+```
+def add_remove_groups(conn, article_id, to_add=[], to_remove=[]):
+    article = 'article:' + article_id
+    for group in to_add:
+        conn.sadd('group:' + group, article)
+    for group in to_remove:
+        conn.srem('group:' + group, article)
+```
+
+Redis有个命令叫ZINTERSTORE，提供SETs和ZSETs，会以不同的方式组合它们的分数（SETs中的条目分数为1）。
+
+![](/assets/QQ20160803-1@2x.png)
+
+下面是获取组中文章的实现：
+
+
+
+
+
