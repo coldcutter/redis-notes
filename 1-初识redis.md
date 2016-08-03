@@ -275,9 +275,17 @@ Redis有个命令叫ZINTERSTORE，提供SETs和ZSETs，会以不同的方式组�
 
 ![](/assets/QQ20160803-1@2x.png)
 
-下面是获取组中文章的实现：
+由于组可能比较大，所以每次计算会耗费一定时间，所以我们把计算结果缓存60秒，下面是获取组中文章的实现：
 
-
-
-
+```
+def get_group_articles(conn, group, page, order='score:'):
+    key = order + group
+    if not conn.exists(key):
+        conn.zinterstore(key,
+            ['group:' + group, order],
+            aggregate = 'max',
+        )
+        conn.expire(key, 60)
+    return get_articles(conn, page, key)
+```
 
