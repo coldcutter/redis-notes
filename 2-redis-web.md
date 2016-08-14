@@ -43,14 +43,14 @@ def clean_sessions(conn):
         if size <= LIMIT:
             time.sleep(1)
             continue
-        
+
         end_index = min(size - LIMIT, 100)
         tokens = conn.zrange('recent:', 0, end_index - 1)
-        
+
         session_keys = []
         for token in tokens:
             session_keys.append('viewed:' + token)
-        
+
         conn.delete(*session_keys)
         conn.hdel('login:', *tokens)
         conn.zrem('recent:', *tokens)
@@ -84,24 +84,30 @@ session_keys.append('cart:' + token)
 def cache_request(conn, request, callback): 
     if not can_cache(conn, request):
         return callback(request)
-    
+
     page_key = 'cache:' + hash_request(request)
     content = conn.get(page_key)
-    
+
     if not content:
         content = callback(request)
         conn.setex(page_key, content, 300)
-    
+
     return content
 ```
 
 ## 2.4 数据库行缓存
+
+![](/assets/QQ20160814-1.png)
+
+使用两个ZSET，一个是schedule，row\_id作为成员，分数是时间戳，表示下一次该行需要拷贝到Redis的时间，另一个是delay，row\_id作为成员，分数是缓存更新之间等待秒数。
 
 ```
 def schedule_row_cache(conn, row_id, delay):
     conn.zadd('delay:', row_id, delay)
     conn.zadd('schedule:', row_id, time.time())
 ```
+
+我们不停取出schedule集合中的第一条，如果为空或者时间没到，等待50毫秒后重试，否则该条就需要更新到Redis，获取delay，如果delay小于等于0，表示该行不需要被缓存了，删除之，否则，从数据库中获取该行，更新缓存并设置下次更新时间为now + delay。
 
 ```
 def cache_rows(conn):
@@ -111,7 +117,7 @@ def cache_rows(conn):
         if not next or next[0][1] > now:
             time.sleep(.05)
             continue
-        
+
         row_id = next[0][0]
         delay = conn.zscore('delay:', row_id)
         if delay <= 0:
@@ -119,10 +125,37 @@ def cache_rows(conn):
             conn.zrem('schedule:', row_id)
             conn.delete('inv:' + row_id)
             continue
-        
+
         row = Inventory.get(row_id)
         conn.zadd('schedule:', row_id, now + delay)
         conn.set('inv:' + row_id, json.dumps(row.to_dict()))
 ```
 
+## 2.5 网页分析
 
+我们在2.1节中的update\_token方法最后加入一行：
+
+```
+conn.zincrby('viewed:', item, -1)
+```
+
+这样我们就能记录每个商品被浏览的次数，且按照次数从多到少排序。我们只保留前20000条，并定期把计数除以2。
+
+```
+def rescale_viewed(conn):
+    while not QUIT:
+        conn.zremrangebyrank('viewed:', 20000, -1)
+        conn.zinterstore('viewed:', {'viewed:': .5})
+        time.sleep(300)
+```
+
+现在我们更新下can_cache方法：
+
+```
+def can_cache(conn, request):
+    item_id = extract_item_id(request)
+    if not item_id or is_dynamic(request):
+        return False
+    rank = conn.zrank('viewed:', item_id)
+    return rank is not None and rank < 10000
+```
