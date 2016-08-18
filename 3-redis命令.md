@@ -24,6 +24,22 @@ Redis中，String用来存储字符串、整数和浮点数，数值类型可以
 
 ## 3.2 Lists
 
+![](/assets/QQ20160818-3.png)
+
+![](/assets/QQ20160818-4.png)
+
+![](/assets/QQ20160818-5.png)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
