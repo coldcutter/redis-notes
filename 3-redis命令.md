@@ -30,15 +30,23 @@ Redis中，String用来存储字符串、整数和浮点数，数值类型可以
 
 ![](/assets/QQ20160818-5.png)
 
+## 3.3 Sets
 
+![](/assets/QQ20160819-1.png)
 
+![](/assets/QQ20160819-2.png)
 
+![](/assets/QQ20160819-3.png)
 
+![](/assets/QQ20160819-4.png)
 
+## 3.4 Hashes
 
+![](/assets/QQ20160819-5.png)
 
+![](/assets/QQ20160819-6.png)
 
-
+## 3.5 Sorted sets
 
 
 
