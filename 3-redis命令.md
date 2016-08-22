@@ -54,11 +54,25 @@ Redis中，String用来存储字符串、整数和浮点数，数值类型可以
 
 ## 3.6 发布\/订阅
 
+![](/assets/QQ20160822-3.png)
 
+## 3.7 其他命令
 
+### 3.7.1 排序
 
+SORT可以排序LISTs，SETs和ZSETs中的数据，甚至是存储在HASHes中的数据。
 
+![](/assets/QQ20160822-4.png)
 
+![](/assets/QQ20160822-5.png)
+
+### 3.7.2 Basic Redis transactions
+
+对于涉及多个keys的操作，Redis提供5种命令帮助我们进行没有中断的操作：WATCH, MULTI, EXEC, UNWATCH, DISCARD。Redis基本事务的意思就是当一个客户端执行多个操作A，B，C，...的时候，其他客户端不能中断它们。这不同于关系数据库事务，可以部分执行，之后回滚或者提交。Redis中，每个基本MULTI\/EXEC事务中的命令顺序执行直到完成，完成后，其他客户端才可以执行它们的命令。
+
+### 3.7.3 Expiring keys
+
+![](/assets/QQ20160822-6.png)
 
 
 
