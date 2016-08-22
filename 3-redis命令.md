@@ -7,7 +7,7 @@ Redis中，String用来存储字符串、整数和浮点数，数值类型可以
 **Table 3.1** **Increment and decrement commands in Redis**
 
 | **Command** | **Example use and description** |
-| :--- | :--- |
+| --- | --- |
 | INCR | INCR key-name—Increments the value stored at the key by 1 |
 | DECR | DECR key-name—Decrements the value stored at the key by 1 |
 | INCRBY | INCRBY key-name amount—Increments the value stored at the key by the provided integer value |
@@ -47,6 +47,18 @@ Redis中，String用来存储字符串、整数和浮点数，数值类型可以
 ![](/assets/QQ20160819-6.png)
 
 ## 3.5 Sorted sets
+
+![](/assets/QQ20160822-1.png)
+
+![](/assets/QQ20160822-2.png)
+
+## 3.6 发布\/订阅
+
+
+
+
+
+
 
 
 
